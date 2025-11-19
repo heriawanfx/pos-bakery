@@ -8,6 +8,8 @@ export interface ProductInput {
   categoryId: string;
   ingredients: ProductIngredientUsage[];
   sellingPrice: number;
+  costOfGoods: number;
+  marginPercentage: number;
 }
 
 interface ProductStoreState {
@@ -25,17 +27,10 @@ export const useProductStore = create<ProductStoreState>()(
 
       addProduct: (data) => {
         const now = new Date().toISOString();
-
-        // HPP & margin akan dihitung beneran nanti pakai utils/pricing
-        const costOfGoods = 0;
-        const marginPercentage = 0;
-
         const newProduct: Product = {
           id: crypto.randomUUID(),
           createdAt: now,
           updatedAt: now,
-          costOfGoods,
-          marginPercentage,
           ...data,
         };
 
