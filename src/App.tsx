@@ -1,33 +1,76 @@
-import './App.css'
+import { useState } from "react";
+import { ThemeToggle } from "./components/ThemeToggle";
+import { Card, CardHeader, CardBody, CardFooter } from "./components/ui/Card";
+import { Button } from "./components/ui/Button";
+import { Input } from "./components/ui/Input";
+import { Select } from "./components/ui/Select";
+import { Modal } from "./components/ui/Modal";
+
 function App() {
+  const [open, setOpen] = useState(false);
+  const [productName, setProductName] = useState("");
+  const [category, setCategory] = useState("");
+
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
-      <div className="max-w-md w-full space-y-4 rounded-2xl bg-card border border-border p-6 shadow-sm">
-        <h1 className="text-xl font-semibold">
-          PoS Bakery – Theme Check
-        </h1>
+      <Card className="max-w-xl w-full p-6 space-y-4">
+        <CardHeader
+          title="PoS Bakery – UI Kit Demo"
+          description="Testing the design system (Button, Card, Input, Select, Modal, ThemeToggle)."
+          actions={<ThemeToggle />}
+        />
+
+        <CardBody>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Input
+              label="Product name"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              placeholder="Nastar 250g"
+              hint="Example of Input component"
+            />
+
+            <Select
+              label="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              hint="Example of Select component"
+            >
+              <option value="">Choose category…</option>
+              <option value="cookies">Dry cookies</option>
+              <option value="cakes">Cakes</option>
+              <option value="others">Others</option>
+            </Select>
+          </div>
+
+          <div className="flex gap-2 flex-wrap">
+            <Button onClick={() => setOpen(true)}>Primary Button</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="ghost">Ghost</Button>
+            <Button variant="destructive">Delete</Button>
+          </div>
+        </CardBody>
+
+        <CardFooter>
+          <Button variant="secondary">Cancel</Button>
+          <Button>Save</Button>
+        </CardFooter>
+      </Card>
+
+      <Modal
+        title="Modal example"
+        open={open}
+        onClose={() => setOpen(false)}
+      >
         <p className="text-sm text-muted-foreground">
-          If you see a cream background and brown-ish text, Tailwind + theme tokens
-          are working.
+          This is a basic modal using the card theme and semantic colors.
         </p>
-
-        <div className="flex gap-3">
-          <button className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            Primary Button
-          </button>
-          <button className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90">
-            Secondary
-          </button>
+        <div className="mt-4 flex justify-end">
+          <Button onClick={() => setOpen(false)}>Close</Button>
         </div>
-
-        <p className="text-xs text-muted-foreground">
-          Dark mode will work later when we add a theme toggle and apply <code>.dark</code> on
-          <code>html</code>.
-        </p>
-      </div>
+      </Modal>
     </div>
   );
 }
 
 export default App;
-
