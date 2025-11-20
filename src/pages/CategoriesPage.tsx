@@ -5,6 +5,7 @@ import { CategoryTable } from "../components/categories/CategoryTable";
 import { CategoryForm } from "../components/categories/CategoryForm";
 import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
+import { useToast } from "../components/ui/ToastProvider";
 
 export function CategoriesPage() {
   const { categories, addCategory, updateCategory, deleteCategory } =
@@ -13,6 +14,7 @@ export function CategoriesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Category | null>(null);
+  const { showToast } = useToast();
 
   const handleAddClick = () => {
     setEditing(null);
@@ -31,8 +33,10 @@ export function CategoriesPage() {
   const handleFormSubmit = (name: string) => {
     if (editing) {
       updateCategory(editing.id, { name });
+      showToast({description: "Category Updated"});
     } else {
       addCategory(name);
+      showToast({description: "New Category Added", variant: "success"});
     }
     setModalOpen(false);
     setEditing(null);
@@ -42,6 +46,7 @@ export function CategoriesPage() {
     if (confirmDelete) {
       deleteCategory(confirmDelete.id);
       setConfirmDelete(null);
+      showToast({description: "Category Deleted"});
     }
   };
 
@@ -81,7 +86,7 @@ export function CategoriesPage() {
       {/* Confirm delete */}
       <Modal
         title="Delete category?"
-        open={!!confirmDelete}
+        open={!!confirmDelete} //Paksa value jadi boolean murni (confirmDelete !== null) 
         onClose={() => setConfirmDelete(null)}
       >
         <p className="text-sm text-muted-foreground">
