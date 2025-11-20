@@ -13,6 +13,8 @@ import {
   TrendingUp,
   AlertTriangle,
   Clock,
+  Coins,
+  Wallet,
 } from "lucide-react";
 import { formatRupiah } from "../utils/format";
 
@@ -55,7 +57,7 @@ export function DashboardPage() {
   const { customers } = useCustomerStore();
   const { orders } = useOrderStore();
 
-  // --- Summary metrics ---
+  // --- Summary metrics dasar ---
   const totalRevenue = useMemo(
     () => orders.reduce((sum, o) => sum + o.totalPrice, 0),
     [orders]
@@ -64,10 +66,70 @@ export function DashboardPage() {
   const averageOrder =
     totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
 
-  const totalIngredients = ingredients.length;
-  const totalCategories = categories.length;
   const totalProducts = products.length;
+  const totalCategories = categories.length;
   const totalCustomers = customers.length;
+
+  // --- Total profit (all time) ---
+  const totalProfit = useMemo(() => {
+    if (!orders.length || !products.length) return 0;
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    let sum = 0;
+
+    for (const order of orders) {
+      for (const item of order.items) {
+        const prod = productMap.get(item.productId);
+        if (!prod) continue;
+
+        const unitProfit = prod.sellingPrice - prod.costOfGoods;
+        sum += unitProfit * (item.quantity || 0);
+      }
+    }
+
+    return Math.round(sum);
+  }, [orders, products]);
+
+  // --- Profit bulan ini ---
+  const profitThisMonth = useMemo(() => {
+    if (!orders.length || !products.length) return 0;
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    let sum = 0;
+
+    for (const order of orders) {
+      const d = new Date(order.createdAt);
+      if (d.getFullYear() !== year || d.getMonth() !== month) continue;
+
+      for (const item of order.items) {
+        const prod = productMap.get(item.productId);
+        if (!prod) continue;
+
+        const unitProfit = prod.sellingPrice - prod.costOfGoods;
+        sum += unitProfit * (item.quantity || 0);
+      }
+    }
+
+    return Math.round(sum);
+  }, [orders, products]);
+
+  const ordersThisMonth = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    return orders.filter((ord) => {
+      const d = new Date(ord.createdAt);
+      return d.getFullYear() === year && d.getMonth() === month;
+    }).length;
+  }, [orders]);
+
+  const overallMargin =
+    totalRevenue > 0 ? Math.round((totalProfit / totalRevenue) * 1000) / 10 : 0;
 
   // --- Low stock ingredients ---
   const lowStockIngredients = useMemo(
@@ -75,7 +137,7 @@ export function DashboardPage() {
       ingredients
         .filter((ing) => ing.quantity > 0 && ing.quantity <= LOW_STOCK_THRESHOLD)
         .sort((a, b) => a.quantity - b.quantity)
-        .slice(0, 5), //Ambil 5 terakhir
+        .slice(0, 5),
     [ingredients]
   );
 
@@ -127,17 +189,37 @@ export function DashboardPage() {
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Quick overview of your bakery business: sales, products, and stock.
+          Quick overview of your bakery business: sales, profit, products, and stock.
         </p>
       </div>
 
       {/* Top stats */}
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <DashboardStatCard
           icon={<ReceiptText className="h-4 w-4" />}
           label="Total revenue"
           value={formatRupiah(totalRevenue)}
           hint={totalOrders > 0 ? `${totalOrders} orders` : "No orders yet"}
+        />
+        <DashboardStatCard
+          icon={<Coins className="h-4 w-4" />}
+          label="Total profit"
+          value={formatRupiah(totalProfit)}
+          hint={
+            totalProfit > 0 && totalRevenue > 0
+              ? `Margin ~${overallMargin.toFixed(1)}%`
+              : "Waiting for sales"
+          }
+        />
+        <DashboardStatCard
+          icon={<Wallet className="h-4 w-4" />}
+          label="Profit this month"
+          value={formatRupiah(profitThisMonth)}
+          hint={
+            ordersThisMonth > 0
+              ? `${ordersThisMonth} orders this month`
+              : "No orders this month"
+          }
         />
         <DashboardStatCard
           icon={<TrendingUp className="h-4 w-4" />}
@@ -155,11 +237,13 @@ export function DashboardPage() {
           icon={<Users className="h-4 w-4" />}
           label="Customers"
           value={totalCustomers}
-          hint={totalCustomers > 0 ? "Returning & new customers" : "No customers yet"}
+          hint={
+            totalCustomers > 0 ? "Returning & new customers" : "No customers yet"
+          }
         />
       </div>
 
-      {/* Middle section: Recent orders + Low stock */}
+      {/* Middle section: Recent orders + Low stock + Top products */}
       <div className="grid gap-4 lg:grid-cols-[3fr,2fr]">
         {/* Recent orders */}
         <Card className="p-4 space-y-3">
@@ -196,15 +280,15 @@ export function DashboardPage() {
                             {new Date(ord.createdAt).toLocaleString()}
                           </td>
                           <td className="py-2 px-2 align-middle text-sm">
-                            {customer ? customer.name : (
+                            {customer ? (
+                              customer.name
+                            ) : (
                               <span className="text-xs text-destructive">
                                 (Customer missing)
                               </span>
                             )}
                           </td>
-                          <td className="py-2 px-2 align-middle text-xs">
-                            {ord.via}
-                          </td>
+                          <td className="py-2 px-2 align-middle text-xs">{ord.via}</td>
                           <td className="py-2 px-2 align-middle text-right text-sm">
                             {formatRupiah(ord.totalPrice)}
                           </td>
@@ -218,12 +302,14 @@ export function DashboardPage() {
           </CardBody>
         </Card>
 
-        {/* Low stock + counts */}
+        {/* Right column: Low stock + Top products */}
         <div className="space-y-4">
           <Card className="p-4 space-y-3">
             <CardHeader
               title="Low stock ingredients"
-              description={`Ingredients below ${LOW_STOCK_THRESHOLD.toLocaleString("id-ID")} units.`}
+              description={`Ingredients below ${LOW_STOCK_THRESHOLD.toLocaleString(
+                "id-ID"
+              )} units.`}
             />
             <CardBody>
               {lowStockIngredients.length === 0 ? (
@@ -254,9 +340,7 @@ export function DashboardPage() {
                             {ing.unit}
                           </span>
                         </div>
-                        <div className="text-[11px] text-destructive">
-                          Low stock
-                        </div>
+                        <div className="text-[11px] text-destructive">Low stock</div>
                       </div>
                     </div>
                   ))}
@@ -265,7 +349,6 @@ export function DashboardPage() {
             </CardBody>
           </Card>
 
-          {/* Top products */}
           <Card className="p-4 space-y-3">
             <CardHeader
               title="Top products"
@@ -274,7 +357,8 @@ export function DashboardPage() {
             <CardBody>
               {topProducts.length === 0 ? (
                 <div className="text-sm text-muted-foreground">
-                  No sales yet. Once orders include products, the ranking will appear here.
+                  No sales yet. Once orders include products, the ranking will appear
+                  here.
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -297,9 +381,7 @@ export function DashboardPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-semibold">
-                          {quantity}x
-                        </div>
+                        <div className="text-sm font-semibold">{quantity}x</div>
                         <div className="text-[11px] text-muted-foreground">
                           Sold quantity
                         </div>
