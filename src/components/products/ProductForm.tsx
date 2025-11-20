@@ -1,14 +1,17 @@
-import { useMemo, useState, type FormEvent } from "react";
-import type { Product, ProductIngredientUsage } from "../../types/product";
-import { useCategoryStore } from "../../stores/useCategoryStore";
-import { useIngredientStore } from "../../stores/useIngredientStore";
-import { calculateCostOfGoods, calculateMarginPercentage } from "../../utils/pricing";
-import { Input } from "../ui/Input";
-import { Select } from "../ui/Select";
-import { CurrencyInput } from "../ui/CurrencyInput";
-import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
-import { Plus, Trash2 } from "lucide-react";
+import { useMemo, useState, type FormEvent } from 'react';
+import type { Product, ProductIngredientUsage } from '../../types/product';
+import { useCategoryStore } from '../../stores/useCategoryStore';
+import { useIngredientStore } from '../../stores/useIngredientStore';
+import {
+  calculateCostOfGoods,
+  calculateMarginPercentage,
+} from '../../utils/pricing';
+import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
+import { CurrencyInput } from '../ui/CurrencyInput';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Plus, Trash2 } from 'lucide-react';
 
 export interface ProductFormValues {
   name: string;
@@ -25,15 +28,19 @@ interface ProductFormProps {
   onCancel?: () => void;
 }
 
-export function ProductForm({ initialValue, onSubmit, onCancel }: ProductFormProps) {
+export function ProductForm({
+  initialValue,
+  onSubmit,
+  onCancel,
+}: ProductFormProps) {
   const { categories } = useCategoryStore();
   const { ingredients } = useIngredientStore();
 
-  const [name, setName] = useState(initialValue?.name ?? "");
+  const [name, setName] = useState(initialValue?.name ?? '');
   const [categoryId, setCategoryId] = useState(() => {
-  if (initialValue) return initialValue.categoryId;
-  return categories[0]?.id ?? "";
-});
+    if (initialValue) return initialValue.categoryId;
+    return categories[0]?.id ?? '';
+  });
   const [sellingPrice, setSellingPrice] = useState<number>(
     initialValue?.sellingPrice ?? 0
   );
@@ -77,11 +84,14 @@ export function ProductForm({ initialValue, onSubmit, onCancel }: ProductFormPro
   const handleAddRow = () => {
     setUsageRows((rows) => [
       ...rows,
-      { ingredientId: ingredients[0]?.id ?? "", quantity: 0 },
+      { ingredientId: ingredients[0]?.id ?? '', quantity: 0 },
     ]);
   };
 
-  const handleUpdateRow = (index: number, patch: Partial<ProductIngredientUsage>) => {
+  const handleUpdateRow = (
+    index: number,
+    patch: Partial<ProductIngredientUsage>
+  ) => {
     setUsageRows((rows) =>
       rows.map((row, i) => (i === index ? { ...row, ...patch } : row))
     );
@@ -123,40 +133,63 @@ export function ProductForm({ initialValue, onSubmit, onCancel }: ProductFormPro
         </Select>
       </div>
 
-      <Card className="p-4 space-y-3">
-        <h3 className="text-sm font-semibold">Ingredients usage</h3>
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold">Ingredients usage</h3>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={handleAddRow}
+            disabled={!hasIngredients}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add ingredient
+          </Button>
+        </div>
+
         {!hasIngredients ? (
           <p className="text-xs text-muted-foreground">
             No ingredients available yet. Please create ingredients first.
           </p>
         ) : (
-          <>
-            <div className="space-y-2">
-              {usageRows.map((row, index) => (
+          <div className="space-y-3">
+            {usageRows.map((row, index) => {
+              const ing = ingredients.find((i) => i.id === row.ingredientId);
+              const remainingStock = ing
+                ? Math.max(ing.quantity - row.quantity, 0)
+                : 0;
+
+              const showLabels = index === 0;
+
+              return (
                 <div
                   key={index}
-                  className="grid gap-2 md:grid-cols-[2fr,1fr,auto] items-end"
+                  className="rounded-xl border border-border/60 bg-background/40 px-3 py-3 space-y-3 md:space-y-0 md:grid md:grid-cols-[minmax(0,2fr),minmax(0,1fr),minmax(0,1fr),auto] md:gap-3"
                 >
+                  {/* Ingredient */}
                   <Select
-                    label={index === 0 ? "Ingredient" : undefined}
+                    label={showLabels ? 'Ingredient' : undefined}
                     value={row.ingredientId}
                     onChange={(e) =>
                       handleUpdateRow(index, { ingredientId: e.target.value })
                     }
                   >
-                    {ingredients.map((ing) => (
-                      <option key={ing.id} value={ing.id}>
-                        {ing.name} (Rp {ing.purchasePrice.toLocaleString("id-ID")})
+                    {ingredients.map((ingOption) => (
+                      <option key={ingOption.id} value={ingOption.id}>
+                        {ingOption.name} (Rp{' '}
+                        {ingOption.purchasePrice.toLocaleString('id-ID')})
                       </option>
                     ))}
                   </Select>
 
+                  {/* Qty used */}
                   <Input
-                    label={index === 0 ? "Qty used" : undefined}
+                    label={showLabels ? 'Qty used' : undefined}
                     type="number"
                     min={0}
                     step="0.01"
-                    value={row.quantity === 0 ? "" : row.quantity}
+                    value={row.quantity === 0 ? '' : row.quantity}
                     onChange={(e) =>
                       handleUpdateRow(index, {
                         quantity: Number(e.target.value) || 0,
@@ -165,29 +198,36 @@ export function ProductForm({ initialValue, onSubmit, onCancel }: ProductFormPro
                     placeholder="e.g. 100"
                   />
 
-                  <button
-                    type="button"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground hover:bg-muted mt-[22px]"
-                    onClick={() => handleRemoveRow(index)}
-                    aria-label="Remove ingredient"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
+                  {/* Remaining stock */}
+                  <Input
+                    label={showLabels ? 'Remaining stock' : undefined}
+                    readOnly
+                    type="number"
+                    value={remainingStock}
+                    hint={
+                      ing
+                        ? `Total stock: ${ing.quantity.toLocaleString(
+                            'id-ID'
+                          )} ${ing.unit}`
+                        : 'No ingredient selected'
+                    }
+                  />
 
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={handleAddRow}
-              disabled={!hasIngredients}
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Add ingredient
-            </Button>
-          </>
+                  {/* Delete button */}
+                  <div className="flex items-center justify-end">
+                    <button
+                      type="button"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground hover:bg-muted"
+                      onClick={() => handleRemoveRow(index)}
+                      aria-label="Remove ingredient"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </Card>
 
@@ -207,7 +247,7 @@ export function ProductForm({ initialValue, onSubmit, onCancel }: ProductFormPro
             </label>
             <div className="mt-1 text-sm">
               {costOfGoods > 0 ? (
-                <span>Rp {costOfGoods.toLocaleString("id-ID")}</span>
+                <span>Rp {costOfGoods.toLocaleString('id-ID')}</span>
               ) : (
                 <span className="text-muted-foreground">Rp 0</span>
               )}
@@ -236,7 +276,7 @@ export function ProductForm({ initialValue, onSubmit, onCancel }: ProductFormPro
           </Button>
         )}
         <Button type="submit" disabled={!canSubmit}>
-          {isEditMode ? "Save product" : "Add product"}
+          {isEditMode ? 'Save product' : 'Add product'}
         </Button>
       </div>
     </form>

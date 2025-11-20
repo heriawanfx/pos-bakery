@@ -72,7 +72,7 @@ export function CurrencyInput({
           {...rest}
           type="text"
           inputMode="numeric"
-          className="w-full bg-transparent border-none outline-none focus:ring-0 focus:outline-none pl-12 pr-2 text-sm"
+          className="w-full bg-transparent border-none outline-none focus:ring-0 focus:outline-none pl-6 pr-2 text-sm"
           value={display}
           onChange={handleChange}
           placeholder="0"
