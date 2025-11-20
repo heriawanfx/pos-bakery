@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Category } from "../types/category";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { setupZustandStorageSync } from "../utils/zustandSync";
 
 interface CategoryStoreState {
   categories: Category[];
@@ -49,3 +50,5 @@ export const useCategoryStore = create<CategoryStoreState>()(
     }
   )
 );
+
+setupZustandStorageSync(STORAGE_KEYS.categories, useCategoryStore);

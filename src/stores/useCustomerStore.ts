@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Customer } from "../types/customer";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { setupZustandStorageSync } from "../utils/zustandSync";
 
 interface CustomerStoreState {
   customers: Customer[];
@@ -49,3 +50,5 @@ export const useCustomerStore = create<CustomerStoreState>()(
     }
   )
 );
+
+setupZustandStorageSync(STORAGE_KEYS.customers, useCustomerStore);

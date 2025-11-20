@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Product, ProductIngredientUsage } from "../types/product";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { setupZustandStorageSync } from "../utils/zustandSync";
 
 export interface ProductInput {
   name: string;
@@ -59,3 +60,5 @@ export const useProductStore = create<ProductStoreState>()(
     }
   )
 );
+
+setupZustandStorageSync(STORAGE_KEYS.products, useProductStore);

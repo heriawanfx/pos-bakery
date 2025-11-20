@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Ingredient } from "../types/ingredient";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { setupZustandStorageSync } from "../utils/zustandSync";
 
 interface IngredientStoreState {
   ingredients: Ingredient[];
@@ -47,3 +48,5 @@ export const useIngredientStore = create<IngredientStoreState>()(
     }
   )
 );
+
+setupZustandStorageSync(STORAGE_KEYS.ingredients, useIngredientStore);

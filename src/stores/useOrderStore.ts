@@ -2,12 +2,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Order, OrderItem, PaymentMethod } from "../types/order";
 import { STORAGE_KEYS } from "../constants/storageKeys";
+import { setupZustandStorageSync } from "../utils/zustandSync";
 
 export interface OrderInput {
   customerId: string;
   items: OrderItem[];
   paymentMethod: PaymentMethod;
   via: string;
+  totalPrice: number; // 👈 sekarang total dikirim dari UI
 }
 
 interface OrderStoreState {
@@ -26,14 +28,10 @@ export const useOrderStore = create<OrderStoreState>()(
       addOrder: (data) => {
         const now = new Date().toISOString();
 
-        // Total akan dihitung betul nanti (pakai products + harga)
-        const totalPrice = 0;
-
         const newOrder: Order = {
           id: crypto.randomUUID(),
           createdAt: now,
           updatedAt: now,
-          totalPrice,
           ...data,
         };
 
@@ -62,3 +60,6 @@ export const useOrderStore = create<OrderStoreState>()(
     }
   )
 );
+
+// 🔁 sync antar tab
+setupZustandStorageSync(STORAGE_KEYS.orders, useOrderStore);
