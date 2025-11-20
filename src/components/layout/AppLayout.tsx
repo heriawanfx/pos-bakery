@@ -10,6 +10,7 @@ import {
   Settings,
   Menu,
   X,
+  ReceiptText, // 👈 tambahkan ini
 } from "lucide-react";
 import clsx from "clsx";
 import { ThemeToggle } from "../ThemeToggle";
@@ -24,6 +25,7 @@ const navItems = [
   { to: "/categories", label: "Categories", icon: Boxes },
   { to: "/products", label: "Products", icon: ShoppingCart },
   { to: "/customers", label: "Customers", icon: Users },
+  { to: "/orders", label: "Orders", icon: ReceiptText },
 ];
 
 export function AppLayout({ children }: AppLayoutProps) {
