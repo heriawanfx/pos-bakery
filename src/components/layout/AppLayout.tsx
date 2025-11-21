@@ -34,7 +34,7 @@ const navItems = [
 export function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { settings } = useSettingsStore();
-  const { appName, tagline, siteName, businessName } = settings;
+  const { appName, tagline } = settings;
 
   const handleCloseMobile = () => setMobileOpen(false);
 
