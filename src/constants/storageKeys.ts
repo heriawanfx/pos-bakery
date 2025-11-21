@@ -4,4 +4,5 @@ export const STORAGE_KEYS = {
   products: "pos-products",
   customers: "pos-customers",
   orders: "pos-orders",
+  settings: "pos-settings",
 } as const;

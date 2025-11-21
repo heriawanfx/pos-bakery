@@ -10,10 +10,12 @@ import {
   Settings,
   Menu,
   X,
-  ReceiptText, // 👈 tambahkan ini
+  ReceiptText,
+  SettingsIcon, // 👈 tambahkan ini
 } from "lucide-react";
 import clsx from "clsx";
 import { ThemeToggle } from "../ThemeToggle";
+import { useSettingsStore } from "../../stores/useSettingsStore";
 
 interface AppLayoutProps {
   children?: ReactNode;
@@ -26,10 +28,13 @@ const navItems = [
   { to: "/products", label: "Products", icon: ShoppingCart },
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/orders", label: "Orders", icon: ReceiptText },
+  { to: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { settings } = useSettingsStore();
+  const { appName, tagline, siteName, businessName } = settings;
 
   const handleCloseMobile = () => setMobileOpen(false);
 
@@ -66,9 +71,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             🧁
           </div>
           <div>
-            <div className="text-sm font-semibold">PoS Bakery</div>
+            <div className="text-sm font-semibold">{appName}</div>
             <div className="text-xs text-muted-foreground">
-              Home-made sweets
+              {tagline}
             </div>
           </div>
         </div>
@@ -78,10 +83,14 @@ export function AppLayout({ children }: AppLayoutProps) {
         </nav>
 
         <div className="mt-auto border-t border-border px-4 py-3 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+          <NavLink
+          key={"/settings"}
+          to={"/settings"} >
           <div className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            <span>Settings (coming soon)</span>
+            <span>Settings</span>
           </div>
+          </NavLink>
         </div>
       </aside>
 
@@ -101,9 +110,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                   🧁
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">PoS Bakery</div>
+                  <div className="text-sm font-semibold">{appName}</div>
                   <div className="text-xs text-muted-foreground">
-                    Home-made sweets
+                    {tagline}
                   </div>
                 </div>
               </div>
@@ -141,11 +150,11 @@ export function AppLayout({ children }: AppLayoutProps) {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 🧁
               </div>
-              <span className="text-sm font-semibold">PoS Bakery</span>
+              <span className="text-sm font-semibold">{appName}</span>
             </div>
 
             <div className="hidden md:block text-sm font-semibold">
-              PoS Bakery – Home-made Cookies Management
+              {tagline}
             </div>
           </div>
 

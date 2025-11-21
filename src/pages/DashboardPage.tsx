@@ -17,8 +17,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { formatRupiah } from "../utils/format";
-
-const LOW_STOCK_THRESHOLD = 200; // bebas diubah
+import { useSettingsStore } from "../stores/useSettingsStore";
 
 interface DashboardStatCardProps {
   icon: React.ReactNode;
@@ -56,6 +55,8 @@ export function DashboardPage() {
   const { products } = useProductStore();
   const { customers } = useCustomerStore();
   const { orders } = useOrderStore();
+  const { settings } = useSettingsStore();
+  const { lowStockThreshold } = settings;
 
   // --- Summary metrics dasar ---
   const totalRevenue = useMemo(
@@ -132,13 +133,14 @@ export function DashboardPage() {
     totalRevenue > 0 ? Math.round((totalProfit / totalRevenue) * 1000) / 10 : 0;
 
   // --- Low stock ingredients ---
+  // Observe ingredients and lowStockThreshold
   const lowStockIngredients = useMemo(
     () =>
       ingredients
-        .filter((ing) => ing.quantity > 0 && ing.quantity <= LOW_STOCK_THRESHOLD)
+        .filter((ing) => ing.quantity > 0 && ing.quantity <= lowStockThreshold)
         .sort((a, b) => a.quantity - b.quantity)
         .slice(0, 5),
-    [ingredients]
+    [ingredients, lowStockThreshold]
   );
 
   // --- Recent orders ---
@@ -307,7 +309,7 @@ export function DashboardPage() {
           <Card className="p-4 space-y-3">
             <CardHeader
               title="Low stock ingredients"
-              description={`Ingredients below ${LOW_STOCK_THRESHOLD.toLocaleString(
+              description={`Ingredients below ${lowStockIngredients.toLocaleString(
                 "id-ID"
               )} units.`}
             />

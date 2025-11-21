@@ -7,6 +7,7 @@ import { ProductsPage } from '../pages/ProductsPage';
 import { CustomersPage } from '../pages/CustomersPage';
 import { OrdersPage } from '../pages/OrdersPage';
 import DemoPage from '../pages/DemoPage';
+import { SettingsPage } from '../pages/SettingsPage';
 
 export function AppRouter() {
   return (
@@ -19,6 +20,7 @@ export function AppRouter() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/demo" element={<DemoPage />} />
           </Route>
         </Routes>
