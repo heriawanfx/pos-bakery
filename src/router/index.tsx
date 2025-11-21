@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, HashRouter } from 'react-router-dom';
+import { Routes, Route, HashRouter } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { DashboardPage } from '../pages/DashboardPage';
 import { IngredientsPage } from '../pages/IngredientsPage';
@@ -11,7 +11,8 @@ import { SettingsPage } from '../pages/SettingsPage';
 
 export function AppRouter() {
   return (
-    <HashRouter>
+    //Ganti <BrowserRouter> jika ingin deploy ke selain Github
+    <HashRouter> 
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
