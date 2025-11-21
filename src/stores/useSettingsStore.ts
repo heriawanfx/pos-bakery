@@ -11,10 +11,10 @@ interface SettingsStoreState {
 }
 
 const defaultSettings: AppSettings = {
-  siteName: "Delicious Bites",
-  appName: "Delicious Bites",
-  tagline: "Crispy on every bites",
-  businessName: "Homemade Bakery",
+  siteName: "PoS Bakery",
+  appName: "PoS Bakery",
+  tagline: "Bakery Point of Sales Management",
+  businessName: "PoS Bakery",
   ownerName: "",
   lowStockThreshold: 200,
 };
