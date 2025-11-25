@@ -15,6 +15,7 @@ import {
   Clock,
   Coins,
   Wallet,
+  ShoppingBag,
 } from "lucide-react";
 import { formatRupiah } from "../utils/format";
 import { useSettingsStore } from "../stores/useSettingsStore";
@@ -57,6 +58,16 @@ export function DashboardPage() {
   const { orders } = useOrderStore();
   const { settings } = useSettingsStore();
   const { lowStockThreshold } = settings;
+
+  const totalInventoryValue = useMemo(
+  () =>
+    ingredients.reduce(
+      (sum, ing) => sum + ing.purchasePrice * 1,
+      0
+    ),
+  [ingredients]
+);
+
 
   // --- Summary metrics dasar ---
   const totalRevenue = useMemo(
@@ -132,6 +143,8 @@ export function DashboardPage() {
   const overallMargin =
     totalRevenue > 0 ? Math.round((totalProfit / totalRevenue) * 1000) / 10 : 0;
 
+    const totalProfitFromPurchased = totalRevenue - totalInventoryValue
+
   // --- Low stock ingredients ---
   // Observe ingredients and lowStockThreshold
   const lowStockIngredients = useMemo(
@@ -196,7 +209,14 @@ export function DashboardPage() {
       </div>
 
       {/* Top stats */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {/* 👇 Card baru: Modal stok bahan / Total belanja bahan (saat ini) */}
+        <DashboardStatCard
+            icon={<ShoppingBag className="h-4 w-4" />}
+            label="Total purchased"
+            value={formatRupiah(totalInventoryValue)}
+            hint={totalInventoryValue > 0 ? `All purchased stocks` : "No purchased item"}
+        />
         <DashboardStatCard
           icon={<ReceiptText className="h-4 w-4" />}
           label="Total revenue"
@@ -215,12 +235,12 @@ export function DashboardPage() {
         />
         <DashboardStatCard
           icon={<Wallet className="h-4 w-4" />}
-          label="Profit this month"
-          value={formatRupiah(profitThisMonth)}
+          label="Total profit from purchased"
+          value={formatRupiah(totalProfitFromPurchased)}
           hint={
-            ordersThisMonth > 0
-              ? `${ordersThisMonth} orders this month`
-              : "No orders this month"
+            totalProfitFromPurchased != 0
+              ? `Profit from purchased stock`
+              : "Waiting for sales"
           }
         />
         <DashboardStatCard
