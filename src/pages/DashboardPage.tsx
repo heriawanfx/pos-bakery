@@ -102,6 +102,7 @@ export function DashboardPage() {
     return Math.round(sum);
   }, [orders, products]);
 
+  /* 
   // --- Profit bulan ini ---
   const profitThisMonth = useMemo(() => {
     if (!orders.length || !products.length) return 0;
@@ -139,7 +140,8 @@ export function DashboardPage() {
       return d.getFullYear() === year && d.getMonth() === month;
     }).length;
   }, [orders]);
-
+  */
+ 
   const overallMargin =
     totalRevenue > 0 ? Math.round((totalProfit / totalRevenue) * 1000) / 10 : 0;
 
