@@ -1,20 +1,31 @@
-import { useState } from "react";
-import type { Category } from "../types/category";
-import { useCategoryStore } from "../stores/useCategoryStore";
-import { CategoryTable } from "../components/categories/CategoryTable";
-import { CategoryForm } from "../components/categories/CategoryForm";
-import { Modal } from "../components/ui/Modal";
-import { Button } from "../components/ui/Button";
-import { useToast } from "../components/ui/ToastProvider";
+import { useEffect, useState } from 'react';
+import type { Category } from '../types/category';
+import { useCategoryStore } from '../stores/useCategoryStore';
+import { CategoryTable } from '../components/categories/CategoryTable';
+import { CategoryForm } from '../components/categories/CategoryForm';
+import { Modal } from '../components/ui/Modal';
+import { Button } from '../components/ui/Button';
+import { useToast } from '../components/ui/ToastProvider';
 
 export function CategoriesPage() {
-  const { categories, addCategory, updateCategory, deleteCategory } =
-    useCategoryStore();
+  const {
+    categories,
+    loading,
+    error,
+    fetchCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+  } = useCategoryStore();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Category | null>(null);
   const { showToast } = useToast();
+
+  useEffect(() => {
+    void fetchCategories();
+  }, [fetchCategories]);
 
   const handleAddClick = () => {
     setEditing(null);
@@ -30,23 +41,44 @@ export function CategoriesPage() {
     setConfirmDelete(category);
   };
 
-  const handleFormSubmit = (name: string) => {
+  const handleFormSubmit = async (category: Category) => {
     if (editing) {
-      updateCategory(editing.id, { name });
-      showToast({description: "Category Updated"});
+      //updateCategory(editing.id, { name });
+
+      const updated = await updateCategory(category.id, category);
+      if (!updated) {
+        showToast({ description: 'Error', variant: 'error' });
+        return;
+      }
+
+      showToast({ description: 'Category Updated' });
     } else {
-      addCategory(name);
-      showToast({description: "New Category Added", variant: "success"});
+      //addCategory(name);
+
+      const created = await createCategory(category);
+      if (!created) {
+        showToast({ description: 'Error', variant: 'error' });
+        return;
+      }
+
+      showToast({ description: 'New Category Added', variant: 'success' });
     }
     setModalOpen(false);
     setEditing(null);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (confirmDelete) {
-      deleteCategory(confirmDelete.id);
+      //deleteCategory(confirmDelete.id);
+
+      const deleted = await deleteCategory(confirmDelete.id);
+      if (!deleted) {
+        showToast({ description: 'Error', variant: 'error' });
+        return;
+      }
+
       setConfirmDelete(null);
-      showToast({description: "Category Deleted"});
+      showToast({ description: 'Category Deleted' });
     }
   };
 
@@ -56,17 +88,22 @@ export function CategoriesPage() {
       <p className="text-sm text-muted-foreground">
         Manage product categories used by your bakery items.
       </p>
-
-      <CategoryTable
-        categories={categories}
-        onAdd={handleAddClick}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteClick}
-      />
-
+      {loading ? (
+        <div className="text-sm text-muted-foreground">
+          Loading categories...
+        </div>
+      ) : (
+        <CategoryTable
+          categories={categories}
+          onAdd={handleAddClick}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+        />
+      )}
+      {error && <div className="text-xs text-red-500 mb-2">{error}</div>}
       {/* Modal Add/Edit */}
       <Modal
-        title={editing ? "Edit category" : "Add category"}
+        title={editing ? 'Edit category' : 'Add category'}
         open={modalOpen}
         onClose={() => {
           setModalOpen(false);
@@ -82,20 +119,19 @@ export function CategoriesPage() {
           }}
         />
       </Modal>
-
       {/* Confirm delete */}
       <Modal
         title="Delete category?"
-        open={!!confirmDelete} //Paksa value jadi boolean murni (confirmDelete !== null) 
+        open={!!confirmDelete} //Paksa value jadi boolean murni (confirmDelete !== null)
         onClose={() => setConfirmDelete(null)}
       >
         <p className="text-sm text-muted-foreground">
-          Are you sure you want to delete{" "}
+          Are you sure you want to delete{' '}
           <span className="font-semibold text-foreground">
             {confirmDelete?.name}
           </span>
-          ? This action cannot be undone, and products using this category
-          might show as “Category missing”.
+          ? This action cannot be undone, and products using this category might
+          show as “Category missing”.
         </p>
         <div className="mt-4 flex justify-end gap-2">
           <Button

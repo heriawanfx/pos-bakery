@@ -5,18 +5,24 @@ import { Button } from "../ui/Button";
 
 interface CategoryFormProps {
   initialValue?: Category;
-  onSubmit: (name: string) => void;
+  onSubmit: (name: Category) => void;
   onCancel?: () => void;
 }
 
 export function CategoryForm({ initialValue, onSubmit, onCancel }: CategoryFormProps) {
-  const [name, setName] = useState(initialValue?.name ?? "");
+  const [category, setCategory] = useState<Category>(initialValue ?? {
+    id: "",
+    name: "",
+    description: "",
+    createdAt: "",
+    updatedAt: ""
+  });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const trimmed = name.trim();
+    const trimmed = category.name.trim();
     if (!trimmed) return;
-    onSubmit(trimmed);
+    onSubmit({...category, name: trimmed});
   };
 
   const isEditMode = Boolean(initialValue);
@@ -25,10 +31,15 @@ export function CategoryForm({ initialValue, onSubmit, onCancel }: CategoryFormP
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
         label="Category name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        value={category.name}
+        onChange={(e) => setCategory({...category, name: e.target.value})}
         placeholder="e.g. Dry cookies"
         required
+      />
+      <Input
+        label="Description"
+        value={category.description ?? ""}
+        onChange={(e) => setCategory({...category, description: e.target.value})}
       />
 
       <div className="flex justify-end gap-2">

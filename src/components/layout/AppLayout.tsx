@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Utensils,
@@ -11,11 +11,14 @@ import {
   Menu,
   X,
   ReceiptText,
-  SettingsIcon, // 👈 tambahkan ini
+  SettingsIcon,
+  LogOut, // 👈 tambahkan ini
 } from "lucide-react";
 import clsx from "clsx";
 import { ThemeToggle } from "../ThemeToggle";
 import { useSettingsStore } from "../../stores/useSettingsStore";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { Button } from "../ui/Button";
 
 interface AppLayoutProps {
   children?: ReactNode;
@@ -35,6 +38,13 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { settings } = useSettingsStore();
   const { appName, tagline } = settings;
+  const logout = useAuthStore((s) => s.logout);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   const handleCloseMobile = () => setMobileOpen(false);
 
@@ -161,6 +171,17 @@ export function AppLayout({ children }: AppLayoutProps) {
           <div className="flex items-center gap-2">
             <ThemeToggle />
           </div>
+           <div className="flex items-center gap-2">
+        {/* Theme toggle dsb */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
+      </div>
         </header>
 
         {/* Content area */}

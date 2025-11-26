@@ -52,6 +52,7 @@ export function CategoryTable({
               <thead>
                 <tr className="border-b border-border text-xs text-muted-foreground">
                   <th className="py-2 pr-2 text-left">Name</th>
+                  <th className="py-2 pr-2 text-left">Description</th>
                   <th className="py-2 px-2 text-left">Created</th>
                   <th className="py-2 pl-2 text-right">Actions</th>
                 </tr>
@@ -64,6 +65,9 @@ export function CategoryTable({
                   >
                     <td className="py-2 pr-2 align-middle">
                       <div className="font-medium">{cat.name}</div>
+                    </td>
+                    <td className="py-2 pr-2 align-middle text-muted-foreground">
+                      <div className="font-medium">{cat.description}</div>
                     </td>
                     <td className="py-2 px-2 align-middle text-left text-xs text-muted-foreground">
                       {new Date(cat.createdAt).toLocaleDateString()}
