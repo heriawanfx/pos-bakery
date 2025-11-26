@@ -4,6 +4,7 @@ import type { Category } from "../types/category";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { setupZustandStorageSync } from "../utils/zustandSync";
 import { supabase } from "../utils/supabase";
+import { ResultError, ResultSuccess, type Result } from "../utils/result";
 
 interface CategoryStoreState {
     categories: Category[];
@@ -17,9 +18,9 @@ interface CategoryStoreState {
     */
     
     fetchCategories: () => Promise<void>;
-    createCategory: (input: Partial<Omit<Category, "id">>) => Promise<Category | null>;
-    updateCategory: (id: string, patch: Partial<Omit<Category, "id">>) => Promise<Category | null>;
-    deleteCategory: (id: string) => Promise<boolean>;
+    createCategory: (input: Partial<Omit<Category, "id">>) => Promise<Result<Category>>;
+    updateCategory: (id: string, patch: Partial<Omit<Category, "id">>) => Promise<Result<Category>>;
+    deleteCategory: (id: string) => Promise<Result<Boolean>>;
     clearError: () => void;
 }
 
@@ -75,7 +76,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
                 if (error) {
                     console.error("Error creating category:", error);
                     set({ error: error.message });
-                    return null;
+                    return ResultError(error.message);
                 }
 
                 const newCategory: Category = {
@@ -90,7 +91,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
                     categories: [...state.categories, newCategory],
                 }));
 
-                return newCategory;
+                return ResultSuccess(newCategory);
             },
 
             updateCategory: async (id, patch) => {
@@ -109,7 +110,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
                 if (error) {
                     console.error("Error updating category:", error);
                     set({ error: error.message });
-                    return null;
+                    return ResultError(error.message);
                 }
 
                 const updated: Category = {
@@ -126,7 +127,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
                     ),
                 }));
 
-                return updated;
+                return ResultSuccess(updated);
             },
 
             deleteCategory: async (id) => {
@@ -140,14 +141,14 @@ export const useCategoryStore = create<CategoryStoreState>()(
                 if (error) {
                     console.error("Error deleting category:", error);
                     set({ error: error.message });
-                    return false;
+                    return ResultError(error.message);
                 }
 
                 set((state) => ({
                     categories: state.categories.filter((cat) => cat.id !== id),
                 }));
 
-                return true;
+                return ResultSuccess(true);
             },
         }),
     //    { name: STORAGE_KEYS.categories, }

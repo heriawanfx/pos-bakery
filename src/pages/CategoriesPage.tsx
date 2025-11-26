@@ -55,9 +55,9 @@ export function CategoriesPage() {
     } else {
       //addCategory(name);
 
-      const created = await createCategory(category);
-      if (!created) {
-        showToast({ description: 'Error', variant: 'error' });
+      const result = await createCategory(category);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error' });
         return;
       }
 
