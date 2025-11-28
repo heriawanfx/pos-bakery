@@ -155,6 +155,7 @@ export function ProductForm({
   useEffect(() => {
     if (isEditMode) {
       void fetchByProduct(initialValue?.id ?? -1);
+      console.info(`[useEffect] fetchByProduct(${initialValue?.id})`)
     }
   }, [isEditMode, fetchByProduct]);
 
@@ -162,6 +163,9 @@ export function ProductForm({
     const usages = byProductId[initialValue?.id ?? -1];
     if (!usages) return;
 
+    
+    console.info(`[useEffect] byProductId(${initialValue?.id})`)
+    console.info(`[useEffect] usages`, usages)
     setUsageRows(
       usages.map((u) => ({
         ingredient_id: u.ingredient_id,
@@ -216,7 +220,11 @@ export function ProductForm({
           <p className="text-xs text-muted-foreground">
             No ingredients available yet. Please create ingredients first.
           </p>
-        ) : (
+        ) : loading ? (
+        <div className="text-sm text-muted-foreground">
+        Loading...
+        </div>
+    ) : (
           <div className="space-y-3">
             {usageRows.map((row, index) => {
               const ing = ingredients.find((i) => i.id === row.ingredient_id);

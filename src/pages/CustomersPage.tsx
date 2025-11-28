@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Customer } from "../types/customer";
 import { useCustomerStore } from "../stores/useCustomerStore";
 import { CustomerTable } from "../components/customers/CustomerTable";
@@ -7,12 +7,14 @@ import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
 
 export function CustomersPage() {
-  const { customers, addCustomer, updateCustomer, deleteCustomer } =
+  const { customers, fetch, loading, addCustomer, updateCustomer, deleteCustomer } =
     useCustomerStore();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Customer | null>(null);
+
+  useEffect(() => {fetch()}, [fetch]);
 
   const handleAddClick = () => {
     setEditing(null);
@@ -52,12 +54,16 @@ export function CustomersPage() {
         Manage customer records to speed up order entry.
       </p>
 
-      <CustomerTable
+     {loading ? (
+        <div className="text-sm text-muted-foreground">
+          Loading...
+        </div>
+      ) : ( <CustomerTable
         customers={customers}
         onAdd={handleAddClick}
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
-      />
+      />)}
 
       {/* Add/Edit modal */}
       <Modal

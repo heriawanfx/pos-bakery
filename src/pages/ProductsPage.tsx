@@ -11,13 +11,16 @@ import { useToast } from "../components/ui/ToastProvider";
 import { Result } from "../utils/result";
 
 export function ProductsPage() {
-  const { products, addProduct, updateProduct, deleteProduct } = useProductStore();
+  const { products, loading, fetchProducts, addProduct, updateProduct, deleteProduct } = useProductStore();
   const { categories } = useCategoryStore();
   const { ingredients } = useIngredientStore();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
+
+  
+  useEffect(() => {fetchProducts()}, [fetchProducts]);
 
   const { showToast } = useToast();
 
@@ -93,14 +96,18 @@ export function ProductsPage() {
           <span className="font-semibold">one ingredient</span>.
         </div>
       )}
-
-      <ProductTable
+    {loading ? (
+        <div className="text-sm text-muted-foreground">
+        Loading categories...
+        </div>
+    ) : 
+      (<ProductTable
         products={products}
         categories={categories}
         onAdd={handleAddClick}
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
-      />
+      />)}
 
       {/* Modal Add/Edit */}
       <Modal

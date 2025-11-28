@@ -90,7 +90,7 @@ export function CategoriesPage() {
       </p>
       {loading ? (
         <div className="text-sm text-muted-foreground">
-          Loading categories...
+          Loading...
         </div>
       ) : (
         <CategoryTable

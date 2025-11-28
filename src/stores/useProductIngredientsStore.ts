@@ -8,8 +8,6 @@ interface ProductIngredientsStoreState {
     loading: boolean;
     error: string | null;
 
-    clearError: () => void;
-
     fetchByProduct: (productId: number) => Promise<Result<ProductIngredientUsage[]>>;
 
     saveForProduct: (
@@ -22,8 +20,6 @@ export const useProductIngredientsStore = create<ProductIngredientsStoreState>((
     byProductId: {},
     loading: false,
     error: null,
-
-    clearError: () => set({ error: null }),
 
     fetchByProduct: async (productId) => {
         set({ loading: true, error: null });
@@ -43,7 +39,7 @@ export const useProductIngredientsStore = create<ProductIngredientsStoreState>((
         const mapped = (data ?? []).map((row: ProductIngredientUsage) => ({
             product_id: row.product_id,
             ingredient_id: row.ingredient_id,
-            usage_qty: row.ingredient_id,
+            usage_qty: row.usage_qty,
             created_at: row.created_at,
         }));
 
@@ -59,8 +55,6 @@ export const useProductIngredientsStore = create<ProductIngredientsStoreState>((
     },
 
     saveForProduct: async (productId, usages) => {
-        set({ error: null, loading: true });
-
         // 1) hapus semua usage lama untuk product ini
         const { error: deleteError } = await supabase
             .from("product_ingredients")
@@ -114,7 +108,6 @@ export const useProductIngredientsStore = create<ProductIngredientsStoreState>((
                 ...state.byProductId,
                 [productId]: mapped,
             },
-            loading: false,
         }));
 
         return Result.success(mapped);

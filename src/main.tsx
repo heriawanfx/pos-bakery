@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './styles/globals.css';
 import App from './App.tsx';
 import { applyTheme, getInitialTheme } from './utils/theme.ts';
-import { GlobalErrorBoundary } from './components/GlobalErrorBoundary.tsx';
+//import { GlobalErrorBoundary } from './components/GlobalErrorBoundary.tsx';
 
 // Terapkan theme SEBELUM render
 applyTheme(getInitialTheme());

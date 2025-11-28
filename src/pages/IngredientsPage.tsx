@@ -18,7 +18,7 @@ export function IngredientsPage() {
 
   useEffect(() => {
     fetch();
-  }, [ingredients])
+  }, [fetch])
 
   const handleAddClick = () => {
     setEditing(null);

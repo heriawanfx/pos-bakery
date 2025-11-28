@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const toast: Toast = {
       id,
       duration,
-      title: options.title ?? "Berhasil",
+      title: options.title ?? options.variant == "error" ? "Ada Masalah" : "Berhasil",
       variant: options.variant ?? "info",
       ...options,
     };
