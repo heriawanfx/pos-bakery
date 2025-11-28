@@ -45,7 +45,7 @@ export function CategoriesPage() {
     if (editing) {
       //updateCategory(editing.id, { name });
 
-      const result = await updateCategory(category.id, category);
+      const result = await updateCategory(editing.id, category);
       if (!result.success) {
         showToast({ description: result.error, variant: 'error', title: "Ada Masalah" });
         return;

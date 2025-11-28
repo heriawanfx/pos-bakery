@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Product, ProductIngredientUsage } from '../../types/product';
 import { useCategoryStore } from '../../stores/useCategoryStore';
 import { useIngredientStore } from '../../stores/useIngredientStore';
@@ -12,20 +12,24 @@ import { CurrencyInput } from '../ui/CurrencyInput';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Plus, Trash2 } from 'lucide-react';
+import { useProductIngredientsStore } from '../../stores/useProductIngredientsStore';
+import { useToast } from '../ui/ToastProvider';
+import type { Result } from '../../utils/result';
 
 export interface ProductFormValues {
   name: string;
   category_id: number;
-  product_id: number;
-  ingredients: ProductIngredientUsage[];
+  //product_id: number;
   selling_price: number;
   cost_of_goods: number;
-  margin_percentage: number;
+
+  //margin_percentage: number;
+  //ingredients: ProductIngredientUsage[];
 }
 
 interface ProductFormProps {
   initialValue?: Product;
-  onSubmit: (values: ProductFormValues) => void;
+  onSubmit: (values: ProductFormValues) => Promise<Result<Product | null>>;
   onCancel?: () => void;
 }
 
@@ -70,16 +74,47 @@ export function ProductForm({
   }, [categories, category_id]);
   */
 
-  const handleSubmit = (e: FormEvent) => {
+  const { showToast } = useToast();
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    onSubmit({
+
+    const resProduct = await onSubmit({
       name: name.trim(),
       category_id,
-      product_id: initialValue?.id ?? -1,
-      ingredients: usageRows.filter((u) => u.ingredient_id && u.usage_qty > 0),
+      //product_id: initialValue?.id ?? -1,
       selling_price,
       cost_of_goods,
-      margin_percentage,
+      //margin_percentage,
+      //ingredients: usageRows.filter((u) => u.ingredient_id && u.usage_qty > 0),
+    });
+
+    if (!resProduct.success) {
+      showToast({
+        variant: 'error',
+        description: resProduct.error,
+        title: 'Ada Masalah',
+      });
+      return;
+    }
+
+    const usagesInput = usageRows.filter(
+      (u) => u.ingredient_id && u.usage_qty > 0
+    );
+
+    const resUsage = await saveForProduct(initialValue?.id ?? -1, usagesInput);
+
+    if (!resUsage.success) {
+      showToast({
+        variant: 'error',
+        description: resUsage.error,
+        title: 'Ada Masalah',
+      });
+      return;
+    }
+
+    showToast({
+      description: 'Produk dan bahan berhasil disimpan',
     });
   };
 
@@ -87,7 +122,7 @@ export function ProductForm({
     setUsageRows((rows) => [
       ...rows,
       {
-        ingredient_id: ingredients[0]?.id ?? '',
+        ingredient_id: ingredients[0]?.id ?? -1,
         usage_qty: 0,
         product_id: initialValue?.id ?? -1,
         created_at: new Date().toISOString(),
@@ -114,6 +149,28 @@ export function ProductForm({
     !!category_id &&
     selling_price > 0 &&
     usageRows.some((u) => u.ingredient_id && u.usage_qty > 0);
+
+  const { byProductId, fetchByProduct, saveForProduct, loading } =
+    useProductIngredientsStore();
+  useEffect(() => {
+    if (isEditMode) {
+      void fetchByProduct(initialValue?.id ?? -1);
+    }
+  }, [isEditMode, fetchByProduct]);
+
+  useEffect(() => {
+    const usages = byProductId[initialValue?.id ?? -1];
+    if (!usages) return;
+
+    setUsageRows(
+      usages.map((u) => ({
+        ingredient_id: u.ingredient_id,
+        usage_qty: u.usage_qty,
+        product_id: initialValue?.id ?? -1,
+        created_at: new Date().toISOString(),
+      }))
+    );
+  }, [initialValue?.id, byProductId]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

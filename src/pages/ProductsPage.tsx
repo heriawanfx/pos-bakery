@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "../types/product";
 import { useProductStore } from "../stores/useProductStore";
 import { useCategoryStore } from "../stores/useCategoryStore";
@@ -7,6 +7,8 @@ import { ProductTable } from "../components/products/ProductTable";
 import { ProductForm, type ProductFormValues } from "../components/products/ProductForm";
 import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
+import { useToast } from "../components/ui/ToastProvider";
+import { Result } from "../utils/result";
 
 export function ProductsPage() {
   const { products, addProduct, updateProduct, deleteProduct } = useProductStore();
@@ -16,6 +18,8 @@ export function ProductsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
+
+  const { showToast } = useToast();
 
   const handleAddClick = () => {
     setEditing(null);
@@ -31,14 +35,39 @@ export function ProductsPage() {
     setConfirmDelete(product);
   };
 
-  const handleFormSubmit = (values: ProductFormValues) => {
+  const handleFormSubmit = async (values: ProductFormValues) => {
+    var product;
+
     if (editing) {
-      updateProduct(editing.id, values);
+      //updateProduct(editing.id, values);
+
+       const result = await updateProduct(editing.id, values);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error', title: "Ada Masalah" });
+        return Result.success(null)
+      }
+
+      showToast({ description: 'Data Updated' });
+
+      product = result.data;
+
     } else {
-      addProduct(values);
+      //addProduct(values);
+      const result = await addProduct(values);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error' });
+        return Result.success(null)
+      }
+
+      showToast({ description: 'New Data Added', variant: 'success' });
+
+      product = result.data;
     }
+
     setModalOpen(false);
     setEditing(null);
+
+    return Result.success(product)
   };
 
   const handleConfirmDelete = () => {

@@ -47,6 +47,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         setToasts((prev) => prev.filter((t) => t.id !== id));
       }, duration);
     }
+
+    if(options.variant == "error"){
+        console.error(options.description);
+    }
   }, []);
 
   const dismiss = useCallback((id: string) => {
