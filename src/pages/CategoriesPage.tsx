@@ -13,7 +13,7 @@ export function CategoriesPage() {
     loading,
     error,
     fetchCategories,
-    createCategory,
+    addCategory,
     updateCategory,
     deleteCategory,
   } = useCategoryStore();
@@ -45,9 +45,9 @@ export function CategoriesPage() {
     if (editing) {
       //updateCategory(editing.id, { name });
 
-      const updated = await updateCategory(category.id, category);
-      if (!updated) {
-        showToast({ description: 'Error', variant: 'error' });
+      const result = await updateCategory(category.id, category);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error', title: "Ada Masalah" });
         return;
       }
 
@@ -55,7 +55,7 @@ export function CategoriesPage() {
     } else {
       //addCategory(name);
 
-      const result = await createCategory(category);
+      const result = await addCategory(category);
       if (!result.success) {
         showToast({ description: result.error, variant: 'error' });
         return;
@@ -71,9 +71,9 @@ export function CategoriesPage() {
     if (confirmDelete) {
       //deleteCategory(confirmDelete.id);
 
-      const deleted = await deleteCategory(confirmDelete.id);
-      if (!deleted) {
-        showToast({ description: 'Error', variant: 'error' });
+      const result = await deleteCategory(confirmDelete.id);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error', title: "Ada Masalah" });
         return;
       }
 

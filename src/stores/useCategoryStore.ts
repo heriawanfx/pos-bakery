@@ -4,7 +4,7 @@ import type { Category } from "../types/category";
 import { STORAGE_KEYS } from "../constants/storageKeys";
 import { setupZustandStorageSync } from "../utils/zustandSync";
 import { supabase } from "../utils/supabase";
-import { ResultError, ResultSuccess, type Result } from "../utils/result";
+import { Result } from "../utils/result";
 
 interface CategoryStoreState {
     categories: Category[];
@@ -18,10 +18,9 @@ interface CategoryStoreState {
     */
     
     fetchCategories: () => Promise<void>;
-    createCategory: (input: Partial<Omit<Category, "id">>) => Promise<Result<Category>>;
-    updateCategory: (id: string, patch: Partial<Omit<Category, "id">>) => Promise<Result<Category>>;
-    deleteCategory: (id: string) => Promise<Result<Boolean>>;
-    clearError: () => void;
+    addCategory: (input: Omit<Category, "id"|"created_at"|"updated_at">) => Promise<Result<Category>>;
+    updateCategory: (id: number, patch: Partial<Omit<Category, "id"|"created_at"|"updated_at">>) => Promise<Result<Category>>;
+    deleteCategory: (id: number) => Promise<Result<Boolean>>;
 }
 
 
@@ -31,8 +30,6 @@ export const useCategoryStore = create<CategoryStoreState>()(
             categories: [],
             loading: false,
             error: null,
-
-            clearError: () => set({ error: null }),
 
             fetchCategories: async () => {
                 set({ loading: true, error: null });
@@ -53,15 +50,17 @@ export const useCategoryStore = create<CategoryStoreState>()(
                         id: row.id,
                         name: row.name,
                         description: row.description ?? null,
-                        createdAt: row.created_at,
-                        updatedAt: row.created_at
+                        created_at: row.created_at,
+                        updated_at: row.created_at
                     })) ?? [];
 
                 set({ categories: mapped, loading: false });
             },
 
 
-            createCategory: async (input) => {
+            addCategory: async (input) => {
+                console.log('addCategory', input);
+
                 set({ error: null });
 
                 const { data, error } = await supabase
@@ -76,25 +75,27 @@ export const useCategoryStore = create<CategoryStoreState>()(
                 if (error) {
                     console.error("Error creating category:", error);
                     set({ error: error.message });
-                    return ResultError(error.message);
+                    return Result.error(error.message);
                 }
 
                 const newCategory: Category = {
                     id: data.id,
                     name: data.name,
                     description: data.description,
-                    createdAt: data.created_at,
-                    updatedAt: data.updated_at,
+                    created_at: data.created_at,
+                    updated_at: data.updated_at,
                 };
 
                 set((state) => ({
                     categories: [...state.categories, newCategory],
                 }));
 
-                return ResultSuccess(newCategory);
+                return Result.success(newCategory);
             },
 
             updateCategory: async (id, patch) => {
+                console.log('updateCategory', patch);
+
                 set({ error: null });
 
                 const { data, error } = await supabase
@@ -110,15 +111,15 @@ export const useCategoryStore = create<CategoryStoreState>()(
                 if (error) {
                     console.error("Error updating category:", error);
                     set({ error: error.message });
-                    return ResultError(error.message);
+                    return Result.error(error.message);
                 }
 
                 const updated: Category = {
                     id: data.id,
                     name: data.name,
                     description: data.description ?? null,
-                    createdAt: data.created_at,
-                    updatedAt: data.updated_at,
+                    created_at: data.created_at,
+                    updated_at: data.updated_at,
                 };
 
                 set((state) => ({
@@ -127,10 +128,12 @@ export const useCategoryStore = create<CategoryStoreState>()(
                     ),
                 }));
 
-                return ResultSuccess(updated);
+                return Result.success(updated);
             },
 
             deleteCategory: async (id) => {
+                console.log('deleteCategory', id);
+
                 set({ error: null });
 
                 const { error } = await supabase
@@ -141,14 +144,14 @@ export const useCategoryStore = create<CategoryStoreState>()(
                 if (error) {
                     console.error("Error deleting category:", error);
                     set({ error: error.message });
-                    return ResultError(error.message);
+                    return Result.error(error.message);
                 }
 
                 set((state) => ({
                     categories: state.categories.filter((cat) => cat.id !== id),
                 }));
 
-                return ResultSuccess(true);
+                return Result.success(true);
             },
         }),
     //    { name: STORAGE_KEYS.categories, }

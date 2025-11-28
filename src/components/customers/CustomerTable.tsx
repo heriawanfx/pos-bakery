@@ -66,7 +66,7 @@ export function CustomerTable({
                     <td className="py-2 pr-2 align-middle">
                       <div className="font-medium">{cust.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        Created: {new Date(cust.createdAt).toLocaleDateString()}
+                        Created: {new Date(cust.created_at).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="py-2 px-2 align-middle">

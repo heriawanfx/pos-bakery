@@ -72,24 +72,24 @@ export function ProductTable({
                     <td className="py-2 pr-2 align-middle">
                       <div className="font-medium">{prod.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        Updated: {new Date(prod.updatedAt).toLocaleDateString()}
+                        Updated: {new Date(prod.updated_at).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="py-2 px-2 align-middle text-left">
-                      {categoryMap.get(prod.categoryId) ?? (
+                      {categoryMap.get(prod.category_id) ?? (
                         <span className="text-xs text-destructive">
                           (Category missing)
                         </span>
                       )}
                     </td>
                     <td className="py-2 px-2 align-middle text-right">
-                      Rp {prod.costOfGoods.toLocaleString("id-ID")}
+                      Rp {prod.cost_of_goods.toLocaleString("id-ID")}
                     </td>
                     <td className="py-2 px-2 align-middle text-right">
-                      Rp {prod.sellingPrice.toLocaleString("id-ID")}
+                      Rp {prod.selling_price.toLocaleString("id-ID")}
                     </td>
                     <td className="py-2 px-2 align-middle text-right">
-                      {prod.marginPercentage.toFixed(1)}%
+                      {prod.margin_percentage.toFixed(1)}%
                     </td>
                     <td className="py-2 pl-2 align-middle">
                       <div className="flex justify-end gap-2">

@@ -37,7 +37,7 @@ const navItems = [
 export function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { settings } = useSettingsStore();
-  const { appName, tagline } = settings;
+  const { app_name, tagline } = settings;
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
@@ -81,7 +81,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             🧁
           </div>
           <div>
-            <div className="text-sm font-semibold">{appName}</div>
+            <div className="text-sm font-semibold">{app_name}</div>
             <div className="text-xs text-muted-foreground">
               {tagline}
             </div>
@@ -120,7 +120,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   🧁
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">{appName}</div>
+                  <div className="text-sm font-semibold">{app_name}</div>
                   <div className="text-xs text-muted-foreground">
                     {tagline}
                   </div>
@@ -160,7 +160,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 🧁
               </div>
-              <span className="text-sm font-semibold">{appName}</span>
+              <span className="text-sm font-semibold">{app_name}</span>
             </div>
 
             <div className="hidden md:block text-sm font-semibold">

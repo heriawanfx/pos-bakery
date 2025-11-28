@@ -6,18 +6,18 @@ import { setupZustandStorageSync } from "../utils/zustandSync";
 
 export interface ProductInput {
   name: string;
-  categoryId: string;
+  category_id: number;
   ingredients: ProductIngredientUsage[];
-  sellingPrice: number;
-  costOfGoods: number;
-  marginPercentage: number;
+  selling_price: number;
+  cost_of_goods: number;
+  margin_percentage: number;
 }
 
 interface ProductStoreState {
   products: Product[];
   addProduct: (data: ProductInput) => void;
-  updateProduct: (id: string, patch: Partial<Omit<Product, "id">>) => void;
-  deleteProduct: (id: string) => void;
+  updateProduct: (id: number, patch: Partial<Omit<Product, "id">>) => void;
+  deleteProduct: (id: number) => void;
   clearAll: () => void;
 }
 
@@ -29,9 +29,9 @@ export const useProductStore = create<ProductStoreState>()(
       addProduct: (data) => {
         const now = new Date().toISOString();
         const newProduct: Product = {
-          id: crypto.randomUUID(),
-          createdAt: now,
-          updatedAt: now,
+          id: -1,
+          created_at: now,
+          updated_at: now,
           ...data,
         };
 
@@ -42,7 +42,7 @@ export const useProductStore = create<ProductStoreState>()(
         const now = new Date().toISOString();
         set({
           products: get().products.map((prod) =>
-            prod.id === id ? { ...prod, ...patch, updatedAt: now } : prod
+            prod.id === id ? { ...prod, ...patch, updated_at: now } : prod
           ),
         });
       },

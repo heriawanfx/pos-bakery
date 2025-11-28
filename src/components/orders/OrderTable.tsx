@@ -1,8 +1,8 @@
-import type { Order } from "../../types/order";
-import type { Customer } from "../../types/customer";
-import { Card, CardBody, CardHeader } from "../ui/Card";
-import { Button } from "../ui/Button";
-import { Plus, Pencil, Trash2, ReceiptText } from "lucide-react";
+import type { Order } from '../../types/order';
+import type { Customer } from '../../types/customer';
+import { Card, CardBody, CardHeader } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Plus, Pencil, Trash2, ReceiptText } from 'lucide-react';
 
 interface OrderTableProps {
   orders: Order[];
@@ -64,52 +64,55 @@ export function OrderTable({
                 </tr>
               </thead>
               <tbody>
-                {orders.map((ord) => (
-                  <tr
-                    key={ord.id}
-                    className="border-b border-border/60 last:border-0"
-                  >
-                    <td className="py-2 pr-2 align-middle text-xs text-muted-foreground">
-                      {new Date(ord.createdAt).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-2 align-middle">
-                      {customerMap.get(ord.customerId) ?? (
-                        <span className="text-xs text-destructive">
-                          (Customer missing)
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-2 px-2 align-middle text-xs capitalize">
-                      {ord.paymentMethod}
-                    </td>
-                    <td className="py-2 px-2 align-middle text-xs">
-                      {ord.via}
-                    </td>
-                    <td className="py-2 px-2 align-middle text-right">
-                      Rp {ord.totalPrice.toLocaleString("id-ID")}
-                    </td>
-                    <td className="py-2 pl-2 align-middle">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onEdit(ord)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onDelete(ord)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {orders.map((ord) => {
+                  console.log('orders', orders);
+                  return (
+                    <tr
+                      key={ord.id}
+                      className="border-b border-border/60 last:border-0"
+                    >
+                      <td className="py-2 pr-2 align-middle text-xs text-muted-foreground">
+                        {new Date(ord.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 px-2 align-middle">
+                        {customerMap.get(ord.customer_id) ?? (
+                          <span className="text-xs text-destructive">
+                            (Customer missing)
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 px-2 align-middle text-xs capitalize">
+                        {ord.payment_method}
+                      </td>
+                      <td className="py-2 px-2 align-middle text-xs">
+                        {ord.order_via}
+                      </td>
+                      <td className="py-2 px-2 align-middle text-right">
+                        Rp {ord.total_price.toLocaleString('id-ID')}
+                      </td>
+                      <td className="py-2 pl-2 align-middle">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEdit(ord)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDelete(ord)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

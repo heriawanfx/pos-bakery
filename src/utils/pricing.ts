@@ -12,11 +12,11 @@ export function calculateCostOfGoods(
   const ingredientMap = new Map(ingredients.map((i) => [i.id, i]));
 
   const total = usages.reduce((sum, usage) => {
-    const ing = ingredientMap.get(usage.ingredientId);
+    const ing = ingredientMap.get(usage.ingredient_id);
     if (!ing) return sum;
     if (ing.quantity <= 0) return sum; // hindari bagi 0
 
-    const cost = (usage.quantity / ing.quantity) * ing.purchasePrice;
+    const cost = (usage.usage_qty / ing.quantity) * ing.purchase_price;
     return sum + cost;
   }, 0);
 
@@ -24,10 +24,10 @@ export function calculateCostOfGoods(
 }
 
 /** Hitung margin (%) dari HPP & harga jual */
-export function calculateMarginPercentage(costOfGoods: number, sellingPrice: number): number {
-  if (costOfGoods <= 0 || sellingPrice <= 0) return 0;
-  const profit = sellingPrice - costOfGoods;
-  const ratio = profit / costOfGoods;
+export function calculateMarginPercentage(cost_of_goods: number, selling_price: number): number {
+  if (cost_of_goods <= 0 || selling_price <= 0) return 0;
+  const profit = selling_price - cost_of_goods;
+  const ratio = profit / cost_of_goods;
   return Math.round(ratio * 1000) / 10; // 1 decimal, misal 35.7
 }
 
@@ -40,9 +40,9 @@ export function calculateOrderTotal(
   const productMap = new Map(products.map((p) => [p.id, p]));
 
   const total = items.reduce((sum, item) => {
-    const prod = productMap.get(item.productId);
+    const prod = productMap.get(item.product_id);
     if (!prod) return sum;
-    const line = item.quantity * prod.sellingPrice;
+    const line = item.quantity * prod.selling_price;
     return sum + line;
   }, 0);
 

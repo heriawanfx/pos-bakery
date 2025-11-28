@@ -10,8 +10,8 @@ applyTheme(getInitialTheme());
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GlobalErrorBoundary>
+    {/* <GlobalErrorBoundary> */}
       <App />
-    </GlobalErrorBoundary>
+    {/* </GlobalErrorBoundary> */}
   </StrictMode>
 );

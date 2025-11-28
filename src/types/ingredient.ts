@@ -1,11 +1,11 @@
 export type IngredientUnit = "gram" | "kg" | "ml" | "liter" | "pcs";
 
 export interface Ingredient {
-  id: string;
+  id: number;
   name: string;
   quantity: number;         // stock on hand
   unit: IngredientUnit;
-  purchasePrice: number;    // price per unit
-  createdAt: string;
-  updatedAt: string;
+  purchase_price: number;    // price per unit
+  created_at: string;
+  updated_at: string | null;
 }

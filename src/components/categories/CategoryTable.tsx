@@ -70,7 +70,7 @@ export function CategoryTable({
                       <div className="font-medium">{cat.description}</div>
                     </td>
                     <td className="py-2 px-2 align-middle text-left text-xs text-muted-foreground">
-                      {new Date(cat.createdAt).toLocaleDateString()}
+                      {new Date(cat.created_at).toLocaleDateString()}
                     </td>
                     <td className="py-2 pl-2 align-middle">
                       <div className="flex justify-end gap-2">

@@ -1,19 +1,19 @@
 export interface ProductIngredientUsage {
-  ingredientId: string;
-  quantity: number; // usage per product unit
+  product_id: number;
+  ingredient_id: number;
+  usage_qty: number; // usage per product unit
+  created_at: string;
 }
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
-  categoryId: string;
+  category_id: number;
+  selling_price: number;
+  cost_of_goods: number;      // HPP (auto calculated later)
+  created_at: string;
+  updated_at: string;
 
+  margin_percentage: number; // (profit / HPP * 100)
   ingredients: ProductIngredientUsage[];
-
-  costOfGoods: number;      // HPP (auto calculated later)
-  sellingPrice: number;
-  marginPercentage: number; // (profit / HPP * 100)
-
-  createdAt: string;
-  updatedAt: string;
 }

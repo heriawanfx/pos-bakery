@@ -15,11 +15,12 @@ import { Plus, Trash2 } from 'lucide-react';
 
 export interface ProductFormValues {
   name: string;
-  categoryId: string;
+  category_id: number;
+  product_id: number;
   ingredients: ProductIngredientUsage[];
-  sellingPrice: number;
-  costOfGoods: number;
-  marginPercentage: number;
+  selling_price: number;
+  cost_of_goods: number;
+  margin_percentage: number;
 }
 
 interface ProductFormProps {
@@ -37,12 +38,12 @@ export function ProductForm({
   const { ingredients } = useIngredientStore();
 
   const [name, setName] = useState(initialValue?.name ?? '');
-  const [categoryId, setCategoryId] = useState(() => {
-    if (initialValue) return initialValue.categoryId;
-    return categories[0]?.id ?? '';
+  const [category_id, setCategoryId] = useState(() => {
+    if (initialValue) return initialValue.category_id;
+    return categories[0]?.id ?? -1;
   });
-  const [sellingPrice, setSellingPrice] = useState<number>(
-    initialValue?.sellingPrice ?? 0
+  const [selling_price, setSellingPrice] = useState<number>(
+    initialValue?.selling_price ?? 0
   );
   const [usageRows, setUsageRows] = useState<ProductIngredientUsage[]>(
     initialValue?.ingredients ?? []
@@ -51,40 +52,46 @@ export function ProductForm({
   const hasIngredients = ingredients.length > 0;
 
   // hitung HPP dan margin secara realtime
-  const costOfGoods = useMemo(
+  const cost_of_goods = useMemo(
     () => calculateCostOfGoods(usageRows, ingredients),
     [usageRows, ingredients]
   );
-  const marginPercentage = useMemo(
-    () => calculateMarginPercentage(costOfGoods, sellingPrice),
-    [costOfGoods, sellingPrice]
+  const margin_percentage = useMemo(
+    () => calculateMarginPercentage(cost_of_goods, selling_price),
+    [cost_of_goods, selling_price]
   );
 
   /*
   useEffect(() => {
-    // jika categories baru dibuat dan tidak ada categoryId, pilih yang pertama
-    if (!categoryId && categories.length > 0) {
+    // jika categories baru dibuat dan tidak ada category_id, pilih yang pertama
+    if (!category_id && categories.length > 0) {
       setCategoryId(categories[0].id);
     }
-  }, [categories, categoryId]);
+  }, [categories, category_id]);
   */
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSubmit({
       name: name.trim(),
-      categoryId,
-      ingredients: usageRows.filter((u) => u.ingredientId && u.quantity > 0),
-      sellingPrice,
-      costOfGoods,
-      marginPercentage,
+      category_id,
+      product_id: initialValue?.id ?? -1,
+      ingredients: usageRows.filter((u) => u.ingredient_id && u.usage_qty > 0),
+      selling_price,
+      cost_of_goods,
+      margin_percentage,
     });
   };
 
   const handleAddRow = () => {
     setUsageRows((rows) => [
       ...rows,
-      { ingredientId: ingredients[0]?.id ?? '', quantity: 0 },
+      {
+        ingredient_id: ingredients[0]?.id ?? '',
+        usage_qty: 0,
+        product_id: initialValue?.id ?? -1,
+        created_at: new Date().toISOString(),
+      },
     ]);
   };
 
@@ -104,9 +111,9 @@ export function ProductForm({
   const isEditMode = Boolean(initialValue);
   const canSubmit =
     !!name.trim() &&
-    !!categoryId &&
-    sellingPrice > 0 &&
-    usageRows.some((u) => u.ingredientId && u.quantity > 0);
+    !!category_id &&
+    selling_price > 0 &&
+    usageRows.some((u) => u.ingredient_id && u.usage_qty > 0);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -121,8 +128,8 @@ export function ProductForm({
 
         <Select
           label="Category"
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
+          value={category_id}
+          onChange={(e) => setCategoryId(Number.parseInt(e.target.value))}
         >
           <option value="">Select category…</option>
           {categories.map((cat) => (
@@ -155,9 +162,9 @@ export function ProductForm({
         ) : (
           <div className="space-y-3">
             {usageRows.map((row, index) => {
-              const ing = ingredients.find((i) => i.id === row.ingredientId);
+              const ing = ingredients.find((i) => i.id === row.ingredient_id);
               const remainingStock = ing
-                ? Math.max(ing.quantity - row.quantity, 0)
+                ? Math.max(ing.quantity - row.usage_qty, 0)
                 : 0;
 
               const showLabels = index === 0;
@@ -170,15 +177,17 @@ export function ProductForm({
                   {/* Ingredient */}
                   <Select
                     label={showLabels ? 'Ingredient' : undefined}
-                    value={row.ingredientId}
+                    value={row.ingredient_id}
                     onChange={(e) =>
-                      handleUpdateRow(index, { ingredientId: e.target.value })
+                      handleUpdateRow(index, {
+                        ingredient_id: Number.parseInt(e.target.value),
+                      })
                     }
                   >
                     {ingredients.map((ingOption) => (
                       <option key={ingOption.id} value={ingOption.id}>
                         {ingOption.name} (Rp{' '}
-                        {ingOption.purchasePrice.toLocaleString('id-ID')})
+                        {ingOption.purchase_price.toLocaleString('id-ID')})
                       </option>
                     ))}
                   </Select>
@@ -189,10 +198,10 @@ export function ProductForm({
                     type="number"
                     min={0}
                     step="0.01"
-                    value={row.quantity === 0 ? '' : row.quantity}
+                    value={row.usage_qty === 0 ? '' : row.usage_qty}
                     onChange={(e) =>
                       handleUpdateRow(index, {
-                        quantity: Number(e.target.value) || 0,
+                        usage_qty: Number(e.target.value) || 0,
                       })
                     }
                     placeholder="e.g. 100"
@@ -236,7 +245,7 @@ export function ProductForm({
         <div className="grid gap-3 md:grid-cols-3">
           <CurrencyInput
             label="Selling price"
-            value={sellingPrice}
+            value={selling_price}
             onChange={(v) => setSellingPrice(v)}
             hint="Final price to customer"
           />
@@ -246,8 +255,8 @@ export function ProductForm({
               Cost of goods (HPP)
             </label>
             <div className="mt-1 text-sm">
-              {costOfGoods > 0 ? (
-                <span>Rp {costOfGoods.toLocaleString('id-ID')}</span>
+              {cost_of_goods > 0 ? (
+                <span>Rp {cost_of_goods.toLocaleString('id-ID')}</span>
               ) : (
                 <span className="text-muted-foreground">Rp 0</span>
               )}
@@ -259,8 +268,8 @@ export function ProductForm({
               Margin
             </label>
             <div className="mt-1 text-sm">
-              {marginPercentage > 0 ? (
-                <span>{marginPercentage.toFixed(1)}%</span>
+              {margin_percentage > 0 ? (
+                <span>{margin_percentage.toFixed(1)}%</span>
               ) : (
                 <span className="text-muted-foreground">0%</span>
               )}

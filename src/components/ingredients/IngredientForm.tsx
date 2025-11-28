@@ -10,7 +10,7 @@ export interface IngredientFormValues {
   name: string;
   quantity: number;
   unit: IngredientUnit;
-  purchasePrice: number;
+  purchase_price: number;
 }
 
 interface IngredientFormProps {
@@ -25,8 +25,8 @@ export function IngredientForm({ initialValue, onSubmit, onCancel }: IngredientF
   const [unit, setUnit] = useState<IngredientUnit>(
     initialValue?.unit ?? INGREDIENT_UNITS[0]
   );
-  const [purchasePrice, setPurchasePrice] = useState<number>(
-    initialValue?.purchasePrice ?? 0
+  const [purchase_price, setPurchasePrice] = useState<number>(
+    initialValue?.purchase_price ?? 0
   );
 
   const handleSubmit = (e: FormEvent) => {
@@ -35,7 +35,7 @@ export function IngredientForm({ initialValue, onSubmit, onCancel }: IngredientF
       name: name.trim(),
       quantity: Number(quantity) || 0,
       unit,
-      purchasePrice: Number(purchasePrice) || 0,
+      purchase_price: Number(purchase_price) || 0,
     });
   };
 
@@ -76,7 +76,7 @@ export function IngredientForm({ initialValue, onSubmit, onCancel }: IngredientF
 
       <CurrencyInput
   label="Purchase price per unit"
-  value={purchasePrice}
+  value={purchase_price}
   onChange={(v) => setPurchasePrice(v)}
   hint="Example: Rp 23.000"
   placeholder="Rp 0"

@@ -11,12 +11,12 @@ interface SettingsStoreState {
 }
 
 const defaultSettings: AppSettings = {
-  siteName: "PoS Bakery",
-  appName: "PoS Bakery",
+  site_name: "PoS Bakery",
+  app_name: "PoS Bakery",
   tagline: "Bakery Point of Sales Management",
-  businessName: "PoS Bakery",
-  ownerName: "",
-  lowStockThreshold: 200,
+  business_name: "PoS Bakery",
+  owner_name: "",
+  low_stock_threshold: 200,
 };
 
 export const useSettingsStore = create<SettingsStoreState>()(

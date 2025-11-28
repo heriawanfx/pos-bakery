@@ -11,11 +11,11 @@ interface CategoryFormProps {
 
 export function CategoryForm({ initialValue, onSubmit, onCancel }: CategoryFormProps) {
   const [category, setCategory] = useState<Category>(initialValue ?? {
-    id: "",
+    id: -1,
     name: "",
     description: "",
-    createdAt: "",
-    updatedAt: ""
+    created_at: "",
+    updated_at: ""
   });
 
   const handleSubmit = (e: FormEvent) => {

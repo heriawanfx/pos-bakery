@@ -66,7 +66,7 @@ export function IngredientTable({
                     <td className="py-2 pr-2 align-middle">
                       <div className="font-medium">{ing.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        Created: {new Date(ing.createdAt).toLocaleDateString()}
+                        Created: {new Date(ing.created_at).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="py-2 px-2 align-middle text-right">
@@ -76,7 +76,7 @@ export function IngredientTable({
                       </span>
                     </td>
                     <td className="py-2 px-2 align-middle text-right">
-                      Rp {ing.purchasePrice.toLocaleString()}
+                      Rp {ing.purchase_price.toLocaleString()}
                     </td>
                     <td className="py-2 pl-2 align-middle">
                       <div className="flex justify-end gap-2">

@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Ingredient } from "../types/ingredient";
 import { useIngredientStore } from "../stores/useIngredientStore";
 import { IngredientTable } from "../components/ingredients/IngredientTable";
 import { IngredientForm, type IngredientFormValues } from "../components/ingredients/IngredientForm";
 import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
+import { useToast } from "../components/ui/ToastProvider";
 
 export function IngredientsPage() {
-  const { ingredients, addIngredient, updateIngredient, deleteIngredient } =
+  const { ingredients, fetch, addIngredient, updateIngredient, deleteIngredient } =
     useIngredientStore();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Ingredient | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Ingredient | null>(null);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    fetch();
+  }, [ingredients])
 
   const handleAddClick = () => {
     setEditing(null);
@@ -28,24 +34,36 @@ export function IngredientsPage() {
     setConfirmDelete(ingredient);
   };
 
-  const handleFormSubmit = (values: IngredientFormValues) => {
+  const handleFormSubmit = async (values: IngredientFormValues) => {
     if (editing) {
-      updateIngredient(editing.id, {
-        name: values.name,
-        quantity: values.quantity,
-        unit: values.unit,
-        purchasePrice: values.purchasePrice,
-      });
+      const result = await updateIngredient(editing.id, values);
+      
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error', title: "Ada Masalah" });
+        return;
+      }
+      showToast({ description: 'Category Updated' });
     } else {
-      addIngredient(values);
+      const result = await addIngredient(values);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error' });
+        return;
+      }
+      
+      showToast({ description: 'New Category Added', variant: 'success' });
     }
     setModalOpen(false);
     setEditing(null);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (confirmDelete) {
-      deleteIngredient(confirmDelete.id);
+      const result = await deleteIngredient(confirmDelete.id);
+      if (!result.success) {
+        showToast({ description: result.error, variant: 'error', title: "Ada Masalah" });
+        return;
+      }
+
       setConfirmDelete(null);
     }
   };
@@ -116,3 +134,4 @@ export function IngredientsPage() {
     </div>
   );
 }
+

@@ -1,8 +1,8 @@
 export interface Customer {
-  id: string;
+  id: number;
   name: string;
-  address?: string;
-  phone?: string;
-  createdAt: string;
-  updatedAt: string;
+  address: string | null;
+  phone: string | null;
+  created_at: string;
+  updated_at: string | null;
 }

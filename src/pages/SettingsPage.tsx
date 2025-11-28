@@ -9,26 +9,26 @@ export function SettingsPage() {
   const { settings, updateSettings, resetSettings } = useSettingsStore();
   const { showToast } = useToast();
 
-  const [siteName, setSiteName] = useState(settings.siteName);
-  const [appName, setAppName] = useState(settings.appName);
+  const [site_name, setSiteName] = useState(settings.site_name);
+  const [app_name, setAppName] = useState(settings.app_name);
   const [tagline, setTagline] = useState(settings.tagline);
-  const [businessName, setBusinessName] = useState(settings.businessName);
-  const [ownerName, setOwnerName] = useState(settings.ownerName);
-  const [lowStockThreshold, setLowStockThreshold] = useState(
-    settings.lowStockThreshold
+  const [business_name, setBusinessName] = useState(settings.business_name);
+  const [owner_name, setOwnerName] = useState(settings.owner_name);
+  const [low_stock_threshold, setLowStockThreshold] = useState(
+    settings.low_stock_threshold
   );
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     updateSettings({
-      siteName: siteName.trim() || "PoS Bakery",
-      appName: appName.trim() || "PoS Bakery",
+      site_name: site_name.trim() || "PoS Bakery",
+      app_name: app_name.trim() || "PoS Bakery",
       tagline: tagline.trim(),
-      businessName: businessName.trim(),
-      ownerName: ownerName.trim(),
-      lowStockThreshold:
-        Number(lowStockThreshold) > 0 ? Number(lowStockThreshold) : 200,
+      business_name: business_name.trim(),
+      owner_name: owner_name.trim(),
+      low_stock_threshold:
+        Number(low_stock_threshold) > 0 ? Number(low_stock_threshold) : 200,
     });
 
     showToast({
@@ -74,14 +74,14 @@ export function SettingsPage() {
             <div className="grid gap-3 md:grid-cols-2">
               <Input
                 label="Site name"
-                value={siteName}
+                value={site_name}
                 onChange={(e) => setSiteName(e.target.value)}
                 placeholder="PoS Bakery"
                 hint="Digunakan sebagai judul utama aplikasi."
               />
               <Input
                 label="App name (NavBar)"
-                value={appName}
+                value={app_name}
                 onChange={(e) => setAppName(e.target.value)}
                 placeholder="PoS Bakery"
                 hint="Muncul di sebelah logo / di sidebar."
@@ -107,13 +107,13 @@ export function SettingsPage() {
             <div className="grid gap-3 md:grid-cols-2">
               <Input
                 label="Nama usaha"
-                value={businessName}
+                value={business_name}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Usaha Kue Rumahan"
               />
               <Input
                 label="Nama pemilik"
-                value={ownerName}
+                value={owner_name}
                 onChange={(e) => setOwnerName(e.target.value)}
                 placeholder="Contoh: Bu Ani"
               />
@@ -133,7 +133,7 @@ export function SettingsPage() {
                 label="Low stock threshold"
                 type="number"
                 min={1}
-                value={lowStockThreshold}
+                value={low_stock_threshold}
                 onChange={(e) =>
                   setLowStockThreshold(Number(e.target.value) || 0)
                 }
@@ -156,12 +156,12 @@ export function SettingsPage() {
               type="button"
               variant="secondary"
               onClick={() => {
-                setSiteName(settings.siteName);
-                setAppName(settings.appName);
+                setSiteName(settings.site_name);
+                setAppName(settings.app_name);
                 setTagline(settings.tagline);
-                setBusinessName(settings.businessName);
-                setOwnerName(settings.ownerName);
-                setLowStockThreshold(settings.lowStockThreshold);
+                setBusinessName(settings.business_name);
+                setOwnerName(settings.owner_name);
+                setLowStockThreshold(settings.low_stock_threshold);
               }}
             >
               Batalkan perubahan

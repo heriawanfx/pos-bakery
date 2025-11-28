@@ -1,9 +1,9 @@
 // src/types/settings.ts
 export interface AppSettings {
-  siteName: string;        // Nama aplikasi untuk judul / dashboard
-  appName: string;         // Nama app di NavBar / Sidebar
+  site_name: string;        // Nama aplikasi untuk judul / dashboard
+  app_name: string;         // Nama app di NavBar / Sidebar
   tagline: string;         // Tagline pendek
-  businessName: string;    // Nama usaha
-  ownerName: string;       // Nama pemilik (optional)
-  lowStockThreshold: number; // Batas stok low stock (dipakai dashboard)
+  business_name: string;    // Nama usaha
+  owner_name: string;       // Nama pemilik (optional)
+  low_stock_threshold: number; // Batas stok low stock (dipakai dashboard)
 }

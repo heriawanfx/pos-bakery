@@ -5,8 +5,8 @@ import { Button } from "../ui/Button";
 
 export interface CustomerFormValues {
   name: string;
-  address?: string;
-  phone?: string;
+  address: string | null;
+  phone: string | null;
 }
 
 interface CustomerFormProps {
@@ -27,8 +27,8 @@ export function CustomerForm({ initialValue, onSubmit, onCancel }: CustomerFormP
 
     onSubmit({
       name: trimmedName,
-      address: address.trim() || undefined,
-      phone: phone.trim() || undefined,
+      address: address?.trim() || null,
+      phone: phone?.trim() || null,
     });
   };
 

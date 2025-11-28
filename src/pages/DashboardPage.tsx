@@ -57,12 +57,12 @@ export function DashboardPage() {
   const { customers } = useCustomerStore();
   const { orders } = useOrderStore();
   const { settings } = useSettingsStore();
-  const { lowStockThreshold } = settings;
+  const { low_stock_threshold } = settings;
 
   const totalInventoryValue = useMemo(
   () =>
     ingredients.reduce(
-      (sum, ing) => sum + ing.purchasePrice * 1,
+      (sum, ing) => sum + ing.purchase_price * 1,
       0
     ),
   [ingredients]
@@ -71,7 +71,7 @@ export function DashboardPage() {
 
   // --- Summary metrics dasar ---
   const totalRevenue = useMemo(
-    () => orders.reduce((sum, o) => sum + o.totalPrice, 0),
+    () => orders.reduce((sum, o) => sum + o.total_price, 0),
     [orders]
   );
   const totalOrders = orders.length;
@@ -91,10 +91,10 @@ export function DashboardPage() {
 
     for (const order of orders) {
       for (const item of order.items) {
-        const prod = productMap.get(item.productId);
+        const prod = productMap.get(item.product_id);
         if (!prod) continue;
 
-        const unitProfit = prod.sellingPrice - prod.costOfGoods;
+        const unitProfit = prod.selling_price - prod.cost_of_goods;
         sum += unitProfit * (item.quantity || 0);
       }
     }
@@ -115,14 +115,14 @@ export function DashboardPage() {
     let sum = 0;
 
     for (const order of orders) {
-      const d = new Date(order.createdAt);
+      const d = new Date(order.created_at);
       if (d.getFullYear() !== year || d.getMonth() !== month) continue;
 
       for (const item of order.items) {
-        const prod = productMap.get(item.productId);
+        const prod = productMap.get(item.product_id);
         if (!prod) continue;
 
-        const unitProfit = prod.sellingPrice - prod.costOfGoods;
+        const unitProfit = prod.selling_price - prod.cost_of_goods;
         sum += unitProfit * (item.quantity || 0);
       }
     }
@@ -136,26 +136,26 @@ export function DashboardPage() {
     const month = now.getMonth();
 
     return orders.filter((ord) => {
-      const d = new Date(ord.createdAt);
+      const d = new Date(ord.created_at);
       return d.getFullYear() === year && d.getMonth() === month;
     }).length;
   }, [orders]);
   */
- 
+
   const overallMargin =
     totalRevenue > 0 ? Math.round((totalProfit / totalRevenue) * 1000) / 10 : 0;
 
     const totalProfitFromPurchased = totalRevenue - totalInventoryValue
 
   // --- Low stock ingredients ---
-  // Observe ingredients and lowStockThreshold
+  // Observe ingredients and low_stock_threshold
   const lowStockIngredients = useMemo(
     () =>
       ingredients
-        .filter((ing) => ing.quantity > 0 && ing.quantity <= lowStockThreshold)
+        .filter((ing) => ing.quantity > 0 && ing.quantity <= low_stock_threshold)
         .sort((a, b) => a.quantity - b.quantity)
         .slice(0, 5),
-    [ingredients, lowStockThreshold]
+    [ingredients, low_stock_threshold]
   );
 
   // --- Recent orders ---
@@ -164,7 +164,7 @@ export function DashboardPage() {
       [...orders]
         .sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         )
         .slice(0, 5),
     [orders]
@@ -174,18 +174,18 @@ export function DashboardPage() {
   const topProducts = useMemo(() => {
     if (!orders.length || !products.length) return [];
 
-    const counter = new Map<string, number>();
+    const counter = new Map<number, number>();
 
     for (const order of orders) {
       for (const item of order.items) {
-        const prev = counter.get(item.productId) ?? 0;
-        counter.set(item.productId, prev + (item.quantity || 0));
+        const prev = counter.get(item.product_id) ?? 0;
+        counter.set(item.product_id, prev + (item.quantity || 0));
       }
     }
 
     const entries = Array.from(counter.entries())
-      .map(([productId, qty]) => {
-        const prod = products.find((p) => p.id === productId);
+      .map(([product_id, qty]) => {
+        const prod = products.find((p) => p.id === product_id);
         return prod
           ? {
               product: prod,
@@ -294,14 +294,14 @@ export function DashboardPage() {
                   </thead>
                   <tbody>
                     {recentOrders.map((ord) => {
-                      const customer = customers.find((c) => c.id === ord.customerId);
+                      const customer = customers.find((c) => c.id === ord.customer_id);
                       return (
                         <tr
                           key={ord.id}
                           className="border-b border-border/60 last:border-0"
                         >
                           <td className="py-2 pr-2 align-middle text-xs text-muted-foreground">
-                            {new Date(ord.createdAt).toLocaleString()}
+                            {new Date(ord.created_at).toLocaleString()}
                           </td>
                           <td className="py-2 px-2 align-middle text-sm">
                             {customer ? (
@@ -312,9 +312,9 @@ export function DashboardPage() {
                               </span>
                             )}
                           </td>
-                          <td className="py-2 px-2 align-middle text-xs">{ord.via}</td>
+                          <td className="py-2 px-2 align-middle text-xs">{ord.order_via}</td>
                           <td className="py-2 px-2 align-middle text-right text-sm">
-                            {formatRupiah(ord.totalPrice)}
+                            {formatRupiah(ord.total_price)}
                           </td>
                         </tr>
                       );
@@ -353,7 +353,7 @@ export function DashboardPage() {
                         <div>
                           <div className="text-sm font-medium">{ing.name}</div>
                           <div className="text-[11px] text-muted-foreground">
-                            Purchase price: {formatRupiah(ing.purchasePrice)} / {ing.unit}
+                            Purchase price: {formatRupiah(ing.purchase_price)} / {ing.unit}
                           </div>
                         </div>
                       </div>
@@ -401,7 +401,7 @@ export function DashboardPage() {
                           </span>
                         </div>
                         <div className="text-[11px] text-muted-foreground">
-                          Price: {formatRupiah(product.sellingPrice)}
+                          Price: {formatRupiah(product.selling_price)}
                         </div>
                       </div>
                       <div className="text-right">

@@ -46,16 +46,19 @@ export class GlobalErrorBoundary extends React.Component<
                 <h1 className="text-base font-semibold">
                   Something went wrong
                 </h1>
+                {this.state.error && (
                 <p className="text-xs text-muted-foreground">
-                  An unexpected error occurred. You can try reloading the app.
+                  {this.state.error.message}
                 </p>
+                
+            )}
               </div>
             </div>
 
-            {this.state.error?.message && (
+            {this.state.error && (
               <div className="rounded-lg bg-muted px-3 py-2">
                 <p className="text-[11px] font-mono text-muted-foreground break-all">
-                  {this.state.error.message}
+                  {this.state.error.stack}
                 </p>
               </div>
             )}

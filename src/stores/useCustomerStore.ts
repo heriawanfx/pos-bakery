@@ -6,9 +6,9 @@ import { setupZustandStorageSync } from "../utils/zustandSync";
 
 interface CustomerStoreState {
   customers: Customer[];
-  addCustomer: (data: Omit<Customer, "id" | "createdAt" | "updatedAt">) => void;
-  updateCustomer: (id: string, patch: Partial<Omit<Customer, "id">>) => void;
-  deleteCustomer: (id: string) => void;
+  addCustomer: (data: Omit<Customer, "id" | "created_at" | "updated_at">) => void;
+  updateCustomer: (id: number, patch: Partial<Omit<Customer, "id">>) => void;
+  deleteCustomer: (id: number) => void;
   clearAll: () => void;
 }
 
@@ -20,9 +20,9 @@ export const useCustomerStore = create<CustomerStoreState>()(
       addCustomer: (data) => {
         const now = new Date().toISOString();
         const newCustomer: Customer = {
-          id: crypto.randomUUID(),
-          createdAt: now,
-          updatedAt: now,
+          id: -1,
+          created_at: now,
+          updated_at: now,
           ...data,
         };
         set({ customers: [...get().customers, newCustomer] });
@@ -32,7 +32,7 @@ export const useCustomerStore = create<CustomerStoreState>()(
         const now = new Date().toISOString();
         set({
           customers: get().customers.map((cust) =>
-            cust.id === id ? { ...cust, ...patch, updatedAt: now } : cust
+            cust.id === id ? { ...cust, ...patch, updated_at: now } : cust
           ),
         });
       },

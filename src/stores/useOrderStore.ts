@@ -5,18 +5,18 @@ import { STORAGE_KEYS } from "../constants/storageKeys";
 import { setupZustandStorageSync } from "../utils/zustandSync";
 
 export interface OrderInput {
-  customerId: string;
+  customer_id: number;
   items: OrderItem[];
-  paymentMethod: PaymentMethod;
-  via: string;
-  totalPrice: number; // 👈 sekarang total dikirim dari UI
+  payment_method: PaymentMethod;
+  order_via: string;
+  total_price: number; // 👈 sekarang total dikirim dari UI
 }
 
 interface OrderStoreState {
   orders: Order[];
   addOrder: (data: OrderInput) => void;
-  updateOrder: (id: string, patch: Partial<Omit<Order, "id">>) => void;
-  deleteOrder: (id: string) => void;
+  updateOrder: (id: number, patch: Partial<Omit<Order, "id">>) => void;
+  deleteOrder: (id: number) => void;
   clearAll: () => void;
 }
 
@@ -29,9 +29,9 @@ export const useOrderStore = create<OrderStoreState>()(
         const now = new Date().toISOString();
 
         const newOrder: Order = {
-          id: crypto.randomUUID(),
-          createdAt: now,
-          updatedAt: now,
+          id: -1,
+          created_at: now,
+          updated_at: now,
           ...data,
         };
 
@@ -42,7 +42,7 @@ export const useOrderStore = create<OrderStoreState>()(
         const now = new Date().toISOString();
         set({
           orders: get().orders.map((ord) =>
-            ord.id === id ? { ...ord, ...patch, updatedAt: now } : ord
+            ord.id === id ? { ...ord, ...patch, updated_at: now } : ord
           ),
         });
       },

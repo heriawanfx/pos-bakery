@@ -1,8 +1,7 @@
 export interface Category {
-  id: string;
+  id: number;
   name: string;
-  //description?: string | null; //optional and nullable property
   description: string | null; //nullable property
-  createdAt: string;
-  updatedAt: string | null;
+  created_at: string;
+  updated_at: string | null;
 }
